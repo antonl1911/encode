@@ -1,0 +1,17 @@
+cmake_minimum_required(VERSION 3.1)
+project(encoder_multi)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+set(BUILD_SHARED_LIBRARIES OFF)
+set(CMAKE_EXE_LINKER_FLAGS "-static")
+
+enable_language(CXX)
+
+find_package(Lame REQUIRED)
+find_package (Threads REQUIRED)
+set(LIBS ${LIBS} ${LAME_LIBRARIES} Threads::Threads)
+include_directories(${LAME_INCLUDE_DIRS})
+add_executable(encoder_multi src/encoder.cpp)
+target_link_libraries(encoder_multi ${LIBS})
