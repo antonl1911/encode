@@ -3,36 +3,57 @@
 #include <fstream>
 #include <vector>
 #include <string>
-using namespace std;
-
+#include <sys/stat.h>
 #include <dirent.h>
-#include "thread.h"
+#include <lame/lame.h>
+
+#include "threadpool.h"
+
+using namespace std;
 
 static vector<string>
 readDirectory(const string &directoryLocation, const string &extension);
-bool Encode(const string& input);
+bool LameEncode(const string& input);
 
 int main(int argc, char *argv[])
 {
+	cout << "Using LAME version " << get_lame_version() << '\n';
+	auto usage = [](const char *name) {	cout << "Usage: " << name << " <input/output directory>" << '\n';};
 	if (argc != 2) {
-		cout << "Usage: " << argv[0] << " <input/output directory>" << '\n';
+		usage(argv[0]);
 		return 1;
 	}
 	const string path(argv[1]);
 	vector<string> files;
 
 	try {
-		files = readDirectory(path, "wav");
+		files = readDirectory(path, ".wav");
 	}
 	catch(const exception& e) {
 		cout << "Error reading from " << path << ": " << e.what() << '\n';
+		usage(argv[0]);
 		return 1;
 	}
-	ThreadPool(files, Encode);
+	if (files.size()) {
+		ThreadPool(files, LameEncode);
+	}	
+	else {
+		cout << "Error: no suitable WAV files found in " << path << '\n';
+		usage(argv[0]);
+		return 1;
+	}
 }
 
-bool Encode(const string& input)
+bool LameEncode(const string& input)
 {
+    const size_t IN_SAMPLERATE = 44100; // default sample-rate
+    const size_t PCM_SIZE = 8192;
+    const size_t MP3_SIZE = 8192;
+	const size_t LAME_GOOD = 5;
+	int16_t pcm_buffer[PCM_SIZE * 2];
+	unsigned char mp3_buffer[MP3_SIZE];
+	const size_t bytes_per_sample = 2 * sizeof(int16_t); // stereo signal, 16 bits
+
 	string output(input);
 	output.replace(output.end()-3, output.end(), "mp3");
 	ifstream wav;
@@ -47,20 +68,16 @@ bool Encode(const string& input)
 		return false;
 	}
 
-
-    const int PCM_SIZE = 8192;
-    const int MP3_SIZE = 8192;
-	const int LAME_GOOD = 5;
-	short int pcm_buffer[PCM_SIZE * 2];
-	unsigned char mp3_buffer[MP3_SIZE];
-	const size_t bytes_per_sample = 2 * sizeof(short); // stereo signal, 16 bits
-
-
     lame_t lame = lame_init();
-	lame_set_in_samplerate(lame, 44100);
+	lame_set_in_samplerate(lame, IN_SAMPLERATE);
 	lame_set_VBR(lame, vbr_default);
 	lame_set_VBR_q(lame, LAME_GOOD);
-	lame_init_params(lame);
+
+	if (lame_init_params(lame) < 0) {
+        wav.close();
+        mp3.close();
+        return false;
+    }
 
 	while (wav.good()) {
 		int read, write;
@@ -93,7 +110,11 @@ static vector<string> readDirectory(const string &directoryLocation, const strin
 		transform(input.begin(), input.end(), result.begin(), ::tolower);
 		return result;
 	};
-
+	auto GetFileSize = [](const string& filename) {
+	    struct stat stat_buf;
+	    int rc = stat(filename.c_str(), &stat_buf);
+	    return rc == 0 ? stat_buf.st_size : -1;
+	};
     string lcExtension(strToLower(extension));
 	
     DIR *dir;
@@ -111,7 +132,11 @@ static vector<string> readDirectory(const string &directoryLocation, const strin
         // Check extension matches (case insensitive)
         size_t pos = lcEntry.rfind(lcExtension);
         if (pos != string::npos && pos == lcEntry.length() - lcExtension.length()) {
-              result.push_back(directoryLocation + '/' + entry);
+			string path = directoryLocation + '/' + entry;
+			if (GetFileSize(path) > 0)
+	        	result.push_back(path);
+			else
+				cout << "Truncated wav file: " << path << '\n';
         }
     }
 
