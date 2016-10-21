@@ -20,10 +20,8 @@ ThreadPool::~ThreadPool()
     cout << "Successfully processed: " << ItemsCompleted << "/" << ItemsTotal << " items" << '\n';
 }
 
-void* ThreadPool::ThreadFunction(void *arg)
+void ThreadPool::ThreadFunction(ThreadPool* ctx)
 {
-    auto *ctx = (ThreadPool*)arg;
-
     while (1) {
         ctx->queue_mutex.lock(); 
         if (ctx->m_queue->empty()) {
@@ -36,5 +34,4 @@ void* ThreadPool::ThreadFunction(void *arg)
         if (ctx->work_fn(cur)) // Increase counter on success
             ctx->ItemsCompleted++;
     }
-    return nullptr;
 }
