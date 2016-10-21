@@ -4,8 +4,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-set(CMAKE_EXE_LINKER_FLAGS "-static -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -flto")
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Og --std=c++14 -Wall -flto -ggdb -D_GLIBCXX_GTHREAD_USE_WEAK=0" )
+set(CMAKE_EXE_LINKER_FLAGS "-s -flto")
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Os --std=c++14 -Wall -flto" )
 
 enable_language(CXX)
 

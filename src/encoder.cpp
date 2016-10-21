@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     if (files.size()) {
-        ThreadPool(files, LameEncode);
+        ThreadPool pool(files, LameEncode);
     }
     else {
         cout << "Error: no suitable WAV files found in " << path << '\n';
