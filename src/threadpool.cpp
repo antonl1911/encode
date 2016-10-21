@@ -9,7 +9,6 @@ ThreadPool::ThreadPool(vector<string>& queue, bool (*fn)(const string&)) : m_que
     tid.resize(NumThreads);
     for (size_t i = 0; i < NumThreads; i++) {
         pthread_create(&tid[i], nullptr, ThreadFunction, this);
-        tid.push_back(i);
     }
 }
 
