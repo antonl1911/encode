@@ -3,12 +3,12 @@
 ThreadPool::ThreadPool(vector<string>& queue, bool (*fn)(const string&)) : m_queue(&queue), work_fn(fn)
 {
     ItemsTotal = queue.size();
-    const size_t coreCount = thread::hardware_concurrency();
-    NumThreads = min(ItemsTotal, coreCount);
+    const size_t coreCount = std::thread::hardware_concurrency();
+    NumThreads = std::min(ItemsTotal, coreCount);
     cout << "Creating " << NumThreads << " threads\n";
     tid.resize(NumThreads);
     for (size_t i = 0; i < NumThreads; i++) {
-        tid[i] = thread(ThreadFunction, ref(*this));
+        tid[i] = std::thread(ThreadFunction, std::ref(*this));
     }
 
 }
