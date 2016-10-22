@@ -4,7 +4,7 @@ ThreadPool::ThreadPool(vector<string>& queue, bool (*fn)(const string&)) : m_que
 {
     ItemsTotal = queue.size();
     const size_t coreCount = thread::hardware_concurrency();
-    NumThreads = min(ItemsTotal, coreCount);
+    NumThreads = std::min(ItemsTotal, coreCount);
     cout << "Creating " << NumThreads << " threads\n";
     tid.resize(NumThreads);
     for (size_t i = 0; i < NumThreads; i++) {

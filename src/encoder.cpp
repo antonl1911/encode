@@ -9,8 +9,6 @@
 
 #include "threadpool.h"
 
-using namespace std;
-
 static vector<string>
 readDirectory(const string &directoryLocation, const string &extension);
 bool LameEncode(const string& input);
@@ -59,12 +57,12 @@ bool LameEncode(const string& input)
 
     string output(input);
     output.replace(output.end() - ext.length(), output.end(), ext);
-    ifstream wav;
-    ofstream mp3;
+    std::ifstream wav;
+    std::ofstream mp3;
 
     try {
-        wav.open(input, ios_base::binary);
-        mp3.open(output, ios_base::binary);
+        wav.open(input, std::ios_base::binary);
+        mp3.open(output, std::ios_base::binary);
     }
     catch (const exception& e) {
         cout << "Error opening input/output file: " << e.what() << '\n';
@@ -124,7 +122,7 @@ static vector<string> readDirectory(const string &directoryLocation, const strin
     struct dirent *ent;
 
     if ((dir = opendir(directoryLocation.c_str())) == nullptr) {
-        throw runtime_error("Unable to open directory.");
+        throw std::runtime_error("Unable to open directory.");
     }
 
     while ((ent = readdir(dir)) != nullptr)
@@ -144,7 +142,7 @@ static vector<string> readDirectory(const string &directoryLocation, const strin
     }
 
     if (closedir(dir) != 0) {
-        throw runtime_error("Unable to close directory.");
+        throw std::runtime_error("Unable to close directory.");
     }
 
     return result;

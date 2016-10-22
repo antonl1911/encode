@@ -4,7 +4,11 @@
 #include <iostream>
 #include <pthread.h>
 
-using namespace std;
+using std::cout;
+using std::vector;
+using std::exception;
+using std::string;
+using std::thread;
 
 class ThreadPool {
     vector<pthread_t> tid;
