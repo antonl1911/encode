@@ -20,7 +20,7 @@ The binary will be installed to `bin` folder.
 # Windows build instructions
 Install msys2, launch mingw64 shell, add compiler and lame using 
 
-`mkdir /mingw64 && pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-lame`
+`mkdir /mingw64 && pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-lame cmake`
 
 change to project dir and run
 
