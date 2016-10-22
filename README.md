@@ -5,7 +5,6 @@ Features:
 * Small, uses modern C++ features (lambdas, auto, thread)
 * Performs parallel processing of several files, creating thread pool
 * Input files support is limited to 16 bit stereo WAV files, sample rate 44100
-* Portable - lame is statically compiled inside binary - one binary for any system
 
 Builds & runs on:
 * Linux (tested on Gentoo)
