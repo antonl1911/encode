@@ -30,7 +30,7 @@ void* ThreadPool::ThreadFunction(void *arg)
             pthread_mutex_unlock(&ctx->queue_mutex);
             break;
         }
-        string cur (ctx->m_queue->back());
+        string cur(ctx->m_queue->back());
         ctx->m_queue->pop_back();
         pthread_mutex_unlock(&ctx->queue_mutex);
         if (ctx->work_fn(cur)) // Increase counter on success
