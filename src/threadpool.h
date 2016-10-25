@@ -6,9 +6,10 @@
 #include <functional>
 
 using std::cout;
-using std::string;
 using std::vector;
 using std::exception;
+using std::string;
+using std::thread;
 
 class ThreadPool {
     vector<std::thread> tid;

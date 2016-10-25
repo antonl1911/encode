@@ -3,8 +3,9 @@
 ThreadPool::ThreadPool(vector<string>& queue, bool (*fn)(const string&)) : m_queue(&queue), work_fn(fn)
 {
     ItemsTotal = queue.size();
-    const size_t coreCount = std::thread::hardware_concurrency();
+    const size_t coreCount = thread::hardware_concurrency();
     NumThreads = std::min(ItemsTotal, coreCount);
+
     cout << "Creating " << NumThreads << " threads\n";
     tid.resize(NumThreads);
     for (size_t i = 0; i < NumThreads; i++) {
@@ -29,7 +30,7 @@ void ThreadPool::ThreadFunction(ThreadPool& ctx)
             ctx.queue_mutex.unlock(); 
             break;
         }
-        string cur (ctx.m_queue->back());
+        string cur(ctx.m_queue->back());
         ctx.m_queue->pop_back();
         ctx.queue_mutex.unlock();
         if (ctx.work_fn(cur)) // Increase counter on success
