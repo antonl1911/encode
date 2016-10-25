@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <cstring>
 #include <string>
 #include <sys/stat.h>
 #include <dirent.h>
@@ -60,12 +61,14 @@ bool LameEncode(const string& input)
     std::ifstream wav;
     std::ofstream mp3;
 
+    wav.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    mp3.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
         wav.open(input, std::ios_base::binary);
         mp3.open(output, std::ios_base::binary);
     }
-    catch (const exception& e) {
-        cout << "Error opening input/output file: " << e.what() << '\n';
+    catch (std::ifstream::failure e) {
+        cout << "Error opening input/output file: " << std::strerror(errno) << '\n';
         return false;
     }
 
@@ -81,9 +84,9 @@ bool LameEncode(const string& input)
     }
 
     while (wav.good()) {
-        int read, write;
+        int write = 0;
         wav.read(reinterpret_cast<char*>(pcm_buffer), sizeof(pcm_buffer));
-        read = wav.gcount() / bytes_per_sample;
+        int read = wav.gcount() / bytes_per_sample;
         if (read == 0)
             write = lame_encode_flush(lame, mp3_buffer, MP3_SIZE);
         else
