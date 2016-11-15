@@ -9,6 +9,11 @@
 #include <lame/lame.h>
 
 #include "threadpool.h"
+using std::cout;
+using std::vector;
+using std::exception;
+using std::string;
+using std::thread;
 
 static vector<string>
 readDirectory(const string &directoryLocation, const string &extension);
@@ -127,22 +132,20 @@ static vector<string> readDirectory(const string &directoryLocation, const strin
     };
     string lcExtension(strToLower(extension));
 
-    DIR *dir;
-    struct dirent *ent;
-
-    if ((dir = opendir(directoryLocation.c_str())) == nullptr) {
+    auto *dir = opendir(directoryLocation.c_str());
+    if (!dir)
         throw std::runtime_error("Unable to open directory.");
-    }
 
+    struct dirent *ent;
     while ((ent = readdir(dir)) != nullptr)
     {
-        string entry( ent->d_name );
+        string entry(ent->d_name);
         string lcEntry(strToLower(entry));
 
         // Check extension matches (case insensitive)
-        size_t pos = lcEntry.rfind(lcExtension);
+        auto pos = lcEntry.rfind(lcExtension);
         if (pos != string::npos && pos == lcEntry.length() - lcExtension.length()) {
-            string path = directoryLocation + '/' + entry;
+            auto path = directoryLocation + '/' + entry;
             if (GetFileSize(path) > 0)
                 result.push_back(path);
             else
@@ -150,9 +153,8 @@ static vector<string> readDirectory(const string &directoryLocation, const strin
         }
     }
 
-    if (closedir(dir) != 0) {
+    if (closedir(dir) != 0)
         throw std::runtime_error("Unable to close directory.");
-    }
 
     return result;
 }

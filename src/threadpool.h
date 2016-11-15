@@ -4,23 +4,18 @@
 #include <iostream>
 #include <pthread.h>
 
-using std::cout;
-using std::vector;
-using std::exception;
-using std::string;
-using std::thread;
 
 class ThreadPool {
-    vector<pthread_t> tid;
-    vector<string> *m_queue;
+    std::vector<pthread_t> tid;
+    std::vector<std::string> *queue;
     static void* ThreadFunction(void *arg);
-    bool (*work_fn)(const string&);
+    bool (*work_fn)(const std::string&);
     size_t ItemsTotal = 0;
     size_t ItemsCompleted = 0;
     size_t NumThreads = 0;
     pthread_mutex_t queue_mutex = PTHREAD_MUTEX_INITIALIZER;
 public:
-    ThreadPool(vector<string>& queue, bool (*fn)(const string&));
+    ThreadPool(std::vector<std::string>& queue, bool (*fn)(const std::string&));
     ThreadPool() = delete;
     ~ThreadPool();
 };
