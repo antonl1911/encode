@@ -36,7 +36,13 @@ int main(int argc, char *argv[])
         return 1;
     }
     if (files.size()) {
-        ThreadPool(files, LameEncode);
+        try {
+            ThreadPool(files, LameEncode);
+        }
+        catch (std::runtime_error &e) {
+            cout << e.what();
+            exit(1);
+        }
     }
     else {
         cout << "Error: no suitable WAV files found in " << path << '\n';
@@ -61,8 +67,8 @@ bool LameEncode(const string& input)
     std::ifstream wav;
     std::ofstream mp3;
 
-    wav.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    mp3.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    wav.exceptions(std::ifstream::failbit);
+    mp3.exceptions(std::ifstream::failbit);
     try {
         wav.open(input, std::ios_base::binary);
         mp3.open(output, std::ios_base::binary);

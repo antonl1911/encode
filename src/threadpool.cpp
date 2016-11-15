@@ -8,7 +8,22 @@ ThreadPool::ThreadPool(vector<string>& queue, bool (*fn)(const string&)) : m_que
     cout << "Creating " << NumThreads << " threads\n";
     tid.resize(NumThreads);
     for (size_t i = 0; i < NumThreads; i++) {
-        pthread_create(&tid[i], nullptr, ThreadFunction, this);
+        auto res = pthread_create(&tid[i], nullptr, ThreadFunction, this);
+        switch (res) {
+        case 0:
+            break;
+        case EAGAIN:
+            throw std::runtime_error("Insufficient resources to create thread.");
+            break;
+        case EINVAL:
+            throw std::runtime_error("Invalid settings in attr.");
+            break;
+        case EPERM:
+            throw std::runtime_error("Insufficitent permissions.");
+            break;
+        default:
+            throw std::runtime_error("Unknown error creating thread.");
+        }
     }
 }
 
